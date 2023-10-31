@@ -20,19 +20,19 @@
     	<div class="container mt-3 mb-3">
         	<div class="row">
         		<div class="col-8 mb-3 m-auto">
-        			<button type="button" class="btn btn-lg btn-primary w-100 playpausebutton" onclick="pressKey('play_pause');"><i class="fa-solid fa-forward-step fa-5x"></i></button>
+        			<button type="button" class="btn btn-lg btn-primary w-100 press-button" data-name="play_pause"><i class="fa-solid fa-forward-step fa-5x"></i></button>
         		</div>
         		<div class="col-6 mb-3">
-        			<button type="button" class="btn btn-lg btn-primary w-100 custom-button" data-name="backward"><i class="fa-solid fa-backward fa-5x"></i></button>
+        			<button type="button" class="btn btn-lg btn-primary w-100 toggle-button" data-name="backward"><i class="fa-solid fa-backward fa-5x"></i></button>
         		</div>
         		<div class="col-6 mb-3">
-        			<button type="button" class="btn btn-lg btn-primary w-100 custom-button" data-name="forward"><i class="fa-solid fa-forward fa-5x"></i></button>
+        			<button type="button" class="btn btn-lg btn-primary w-100 toggle-button" data-name="forward"><i class="fa-solid fa-forward fa-5x"></i></button>
         		</div>
         		<div class="col-6 mb-3">
-        			<button type="button" class="btn btn-lg btn-primary w-100 custom-button" data-name="volume_up"><i class="fa-solid fa-volume-high fa-5x"></i></button>
+        			<button type="button" class="btn btn-lg btn-primary w-100 toggle-button" data-name="volume_up"><i class="fa-solid fa-volume-high fa-5x"></i></button>
         		</div>
         		<div class="col-6 mb-3">
-    				<button type="button" class="btn btn-lg btn-primary w-100 custom-button" data-name="volume_down"><i class="fa-solid fa-volume-low fa-5x"></i></button>
+    				<button type="button" class="btn btn-lg btn-primary w-100 toggle-button" data-name="volume_down"><i class="fa-solid fa-volume-low fa-5x"></i></button>
         		</div>
         	</div>
     	</div>
@@ -62,31 +62,30 @@
                 console.log(`connect_error due to ${err.message}`);
             });
 
-			var intervalId = 0;
-
-			$('.custom-button').on('mousedown touchstart', function(e) {
+			$('.press-button').on('click', function(e) {
 				e.preventDefault();
-                
-				const name = $(this).data('name');
 
-				pressKey(name);
+                const name = $(this).data('name');
 
-                if(intervalId) clearInterval(intervalId);
-			    intervalId = setInterval(function() { pressKey(name); }, 125);
+                socket.emit('press', name);
+			});
+
+			$('.toggle-button').on('mousedown touchstart', function(e) {
+				e.preventDefault();
+
+                const name = $(this).data('name');
+
+                socket.emit('toggle', {name: name, toggle: 'down'});
 			}).on('mouseup mouseleave touchend', function(e) {
 				e.preventDefault();
 
                 const name = $(this).data('name');
 
                 socket.emit('toggle', {name: name, toggle: 'up'});
-
-                if(intervalId) clearInterval(intervalId);
-			    intervalId = 0;
 			});
 
 			function pressKey(name) {
-				console.log('sending: ' + name);
-				socket.emit('press', name);
+				
 			}
 		</script>
     </body>
